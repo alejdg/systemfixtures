@@ -22,3 +22,10 @@ class WgetTest(TestCase):
         path = temp_dir.join("output")
         self.wget({"args": ["wget", "-N", "-O", path, "http://x"]})
         self.assertThat(path, FileContains("data"))
+
+    def test_to_default(self):
+        temp_dir = self.useFixture(TempDir())
+        path = temp_dir.join("x")
+        self.wget({"args": ["wget", "http://x"]})
+        self.assertThat(path, FileContains("data"))
+       
