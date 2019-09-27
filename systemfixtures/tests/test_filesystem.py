@@ -147,3 +147,11 @@ class FakeFilesystemTest(TestCase):
         conn = sqlite3.connect("/foo/bar/db")
         self.addCleanup(conn.close)
         self.assertIsNotNone(conn)
+
+    def test_add_api(self):
+        self.fs.add("/foo")
+        self.fs.add_api("os.chdir")
+        directory = "/foo/bar"
+        os.makedirs(directory)
+        os.chdir(directory)
+        self.assertIn(directory, os.getcwd())

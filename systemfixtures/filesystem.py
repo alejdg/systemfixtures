@@ -41,16 +41,16 @@ class FakeFilesystem(Fixture):
     def _setUp(self):
         self.root = self.useFixture(TempDir())
         self._paths = {}
-        self._ownership = {}
+        self._ownership = {} 
 
         if six.PY2:
             # Python 2 doesn't support a fd argument
-            condition = self._is_fake_path
+            self.condition = self._is_fake_path
         if six.PY3:
-            condition = self._is_fake_path_or_fd
+            self.condition = self._is_fake_path_or_fd
 
         for api in GENERIC_APIS:
-            self.useFixture(Overlay(api, self._generic, condition))
+            self.useFixture(Overlay(api, self._generic, self.condition))
 
         self.useFixture(Overlay("os.fchown", self._fchown, self._is_fake_fd))
         self.useFixture(Overlay("os.chown", self._chown, self._is_fake_path))
@@ -65,7 +65,7 @@ class FakeFilesystem(Fixture):
     def add(self, path):
         """Add a path to the overlay filesytem.
 
-        Any filesystem operation involving the this path or any sub-paths
+        Any filesystem operation involving this path or any sub-paths
         of it will be transparently redirected to temporary root dir.
 
         @path: An absolute path string.
@@ -78,6 +78,16 @@ class FakeFilesystem(Fixture):
             path, _ = os.path.split(path)
             if path == os.sep:
                 break
+
+    def add_api(self, api):
+        """Set a system api to use the overlay filesytem.
+
+        The filesystem operation provided will be transparently
+        redirected to temporary root dir.
+
+        @api: An api string.
+        """
+        self.useFixture(Overlay(api, self._generic, self.condition))
 
     def _fchown(self, real, fileno, uid, gid):
         """Run fake fchown code if fileno points to a sub-path of our tree.

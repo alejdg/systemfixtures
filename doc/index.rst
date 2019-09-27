@@ -157,7 +157,29 @@ even without superuser priviliges:
    >>> oct(info.st_mode)
    '0o100600'
 
+You can also set filesystem APIs that were not originally configured to
+work with the overlay. For example trying to change the current working
+directory to the overlay directory is not possible:
+
+.. doctest::
+
+   >>> os.mkfifo("/foo/baz")
+   Traceback (most recent call last):
+   ...
+   FileNotFoundError: [Errno 2] No such file or directory
+
+
+However, if we add the API to the fake filesystem, it will be possible:
+
+.. doctest::
+
+   >>> filesystem.add_api("os.mkfifo")
+   >>> os.mkfifo("/foo/baz")
+   >>> os.listdir("/foo/")
+   ['bar', 'baz']
+
    >>> filesystem.cleanUp()
+
 
 Network
 +++++++
